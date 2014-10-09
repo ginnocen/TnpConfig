@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
@@ -74,11 +74,12 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("track.isNonnull && pt > 2"),
+    muonsCut     = cms.string("track.isNonnull && pt > 0"), 
     caloMuonsCut = cms.string("pt > 0"),
     tracksCut    = cms.string("pt > 0"),
-    #ORIGINALcaloMuonsCut = cms.string("pt > 2"),
-    #ORIGINALtracksCut    = cms.string("pt > 2"),
+    #ORIGINAL muonsCut     = cms.string("track.isNonnull && pt > 2"),
+    #ORIGINAL caloMuonsCut = cms.string("pt > 2"),
+    #ORIGINAL tracksCut    = cms.string("pt > 2"),
 )
 
 ## ==== Trigger matching
