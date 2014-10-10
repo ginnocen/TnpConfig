@@ -19,7 +19,7 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V43F::All')
+    process.GlobalTag.globaltag = cms.string('START53_V27::All')
     process.source.fileNames = [
         'file:/afs/cern.ch/work/g/ginnocen/public/38291323-E567-E211-8DD9-5404A63886C5.root',
     ]
@@ -69,9 +69,9 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("track.isNonnull && pt > 0"),
-    caloMuonsCut = cms.string("pt > 0"),
-    tracksCut    = cms.string("pt > 0"),
+    muonsCut     = cms.string("track.isNonnull && pt > 1"),
+    caloMuonsCut = cms.string("pt > 1"),
+    tracksCut    = cms.string("pt > 1"),
 )
 
 ## ==== Trigger matching
@@ -85,7 +85,7 @@ addHLTL1Passthrough(process)
 IN_ACCEPTANCE = "((abs(eta) <= 1.3 && pt > 3.3) || (1.3 < abs(eta) <= 2.2 && p > 2.9) || (2.2 < abs(eta) <= 2.4 && pt > 0.8))"
 TRACK_CUTS = "(track.hitPattern.trackerLayersWithMeasurement > 5 && track.normalizedChi2 < 1.8 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 3 && abs(track.dz) < 30)"
 GLB_CUTS = "(isTrackerMuon && muonID('TrackerMuonArbitrated') && muonID('TMOneStationTight'))"
-QUALITY_CUTS =  "(" + GLB_CUTS + ' && ' + TRACK_CUTS + ")"
+QUALITY_CUTS =  "(" + GLB_CUTS + " && " + TRACK_CUTS + ")"
 
 
 MuonQualityFlagspPb = cms.PSet(
@@ -100,7 +100,7 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string(QUALITY_CUTS+ "&&"+ IN_ACCEPTANCE),
+    cut = cms.string(QUALITY_CUTS+ "&&"+ IN_ACCEPTANCE+"&&(!triggerObjectMatchesByPath('HLT_PAMu3_v*',1,0).empty())"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
